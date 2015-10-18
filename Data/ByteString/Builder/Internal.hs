@@ -498,12 +498,15 @@ instance Applicative Put where
 #endif
 
 instance Monad Put where
-  {-# INLINE return #-}
-  return x = Put $ \k -> k x
   {-# INLINE (>>=) #-}
   Put m >>= f = Put $ \k -> m (\m' -> unPut (f m') k)
   {-# INLINE (>>) #-}
+#if MIN_VERSION_base(4,2,0)
+  (>>) = (*>)
+#else
   (>>) = ap_r
+#endif
+  return = pure
 
 
 -- Conversion between Put and Builder
